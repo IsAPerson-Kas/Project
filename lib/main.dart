@@ -13,6 +13,7 @@ import 'package:media_guard_v2/domain/repositories/file_repository.dart';
 import 'package:media_guard_v2/presentation/features/album_unlock/cubit/album_unlock_cubit.dart';
 import 'package:media_guard_v2/router/routes_generate.dart';
 import 'package:media_guard_v2/router/routes_named.dart';
+import 'package:photo_manager/photo_manager.dart';
 
 final getIt = GetIt.instance;
 
@@ -27,6 +28,7 @@ Future<void> _createDefaultAlbum() async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  PhotoManager.clearFileCache();
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
 
   final appDatabase = AppDatabase();

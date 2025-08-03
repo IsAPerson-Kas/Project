@@ -40,6 +40,22 @@ class ImageItemWidget extends StatelessWidget {
             fit: BoxFit.cover,
           ),
         ),
+        // Show play button overlay for video files
+        if (entity.type == AssetType.video)
+          Center(
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.black.withValues(alpha: 0.6),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.play_arrow,
+                color: Colors.white,
+                size: 20,
+              ),
+            ),
+          ),
         PositionedDirectional(
           bottom: 4,
           start: 0,
@@ -86,19 +102,22 @@ class ImageItemWidget extends StatelessWidget {
                           ),
                         ),
                       ),
-                    if (entity.type == AssetType.video)
-                      Container(
-                        padding: const EdgeInsets.all(2),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.7),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: const Icon(
-                          Icons.play_arrow,
-                          color: Colors.white,
-                          size: 16,
-                        ),
-                      ),
+                    Icon(
+                      () {
+                        switch (entity.type) {
+                          case AssetType.other:
+                            return Icons.abc;
+                          case AssetType.image:
+                            return Icons.image;
+                          case AssetType.video:
+                            return Icons.video_file;
+                          case AssetType.audio:
+                            return Icons.audiotrack;
+                        }
+                      }(),
+                      color: Colors.white,
+                      size: 16,
+                    ),
                   ],
                 ),
               ),

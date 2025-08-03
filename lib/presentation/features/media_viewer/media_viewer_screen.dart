@@ -1,10 +1,8 @@
-import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:media_guard_v2/core/constaints/app_strings.dart';
-import 'package:media_guard_v2/core/extensions/color_extension.dart';
 import 'package:media_guard_v2/data/datasources/local_database/tables/guard_file.dart';
 import 'package:media_guard_v2/domain/models/guard_file_model.dart';
 import 'package:media_guard_v2/presentation/features/album_unlock/album_unlock_navigator.dart';
@@ -13,7 +11,7 @@ import 'package:media_guard_v2/presentation/features/media_viewer/cubit/media_vi
 import 'package:video_player/video_player.dart';
 
 class MediaViewerScreen extends StatefulWidget {
-  final List<GuardFileModel> images;
+  final List<GuardFileModel> mediaFiles;
   final int initialIndex;
   final int? albumId;
   final bool isGuestMode;
@@ -21,7 +19,7 @@ class MediaViewerScreen extends StatefulWidget {
 
   const MediaViewerScreen({
     super.key,
-    required this.images,
+    required this.mediaFiles,
     required this.initialIndex,
     this.albumId,
     this.isGuestMode = false,
@@ -40,10 +38,6 @@ class _MediaViewerScreenState extends State<MediaViewerScreen> {
   late List<TransformationController> controllers;
   late List<VoidCallback> listeners;
   bool _isZoomed = false;
-  final Map<int, int> _imageRefreshKeys = {};
-
-  // Video controllers
-  final Map<int, VideoPlayerController> _videoControllers = {};
 
   // Cờ để track trạng thái xác thực trong chế độ khách
   bool _isAuthenticated = false;
@@ -52,7 +46,7 @@ class _MediaViewerScreenState extends State<MediaViewerScreen> {
   void initState() {
     super.initState();
     _cubit = MediaViewerCubit(
-      mediaFiles: widget.images,
+      mediaFiles: widget.mediaFiles,
       initialIndex: widget.initialIndex,
       albumId: widget.albumId,
       isGuestMode: widget.isGuestMode,
@@ -61,13 +55,13 @@ class _MediaViewerScreenState extends State<MediaViewerScreen> {
 
     pageController = PageController(initialPage: widget.initialIndex);
     controllers = List.generate(
-      widget.images.length,
+      widget.mediaFiles.length,
       (_) => TransformationController(),
     );
 
     // Create listeners for all controllers
     listeners = List.generate(
-      widget.images.length,
+      widget.mediaFiles.length,
       (index) =>
           () => _updateZoomState(index),
     );
@@ -77,21 +71,15 @@ class _MediaViewerScreenState extends State<MediaViewerScreen> {
       controllers[i].addListener(listeners[i]);
     }
 
-    // Initialize video controllers for video files
-    _initializeVideoControllers();
+    // Initialize video controller for initial index if it's a video
+    _initializeInitialVideoController();
   }
 
-  Future<void> _initializeVideoControllers() async {
-    for (int i = 0; i < widget.images.length; i++) {
-      final file = widget.images[i];
-      if (file.type == GuardFileType.video) {
-        try {
-          final controller = VideoPlayerController.file(File(file.filePath));
-          await controller.initialize();
-          _videoControllers[i] = controller;
-        } catch (e) {
-          // Failed to initialize video controller
-        }
+  Future<void> _initializeInitialVideoController() async {
+    if (widget.initialIndex < widget.mediaFiles.length) {
+      final initialFile = widget.mediaFiles[widget.initialIndex];
+      if (initialFile.type == GuardFileType.video) {
+        await _cubit.initializeVideoController(widget.initialIndex);
       }
     }
   }
@@ -114,17 +102,12 @@ class _MediaViewerScreenState extends State<MediaViewerScreen> {
       controllers[i].dispose();
     }
 
-    // Dispose video controllers
-    for (final controller in _videoControllers.values) {
-      controller.dispose();
-    }
-
     pageController.dispose();
     _cubit.close();
     super.dispose();
   }
 
-  GuardFileModel get currentImage => widget.images[_cubit.state.currentIndex];
+  GuardFileModel get currentMedia => widget.mediaFiles[_cubit.state.currentIndex];
 
   Future<void> _handleBackNavigation() async {
     // Nếu đã xác thực rồi thì pop luôn
@@ -172,29 +155,35 @@ class _MediaViewerScreenState extends State<MediaViewerScreen> {
             child: Scaffold(
               backgroundColor: Colors.black,
               extendBodyBehindAppBar: true,
+              extendBody: true,
               appBar: AppBar(
                 backgroundColor: Colors.transparent,
                 elevation: 0,
-                leading: Container(
-                  margin: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacityValue(0.5),
-                    shape: BoxShape.circle,
+                leading: IconButton(
+                  icon: Container(
+                    margin: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.5),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.arrow_back, color: Colors.white),
                   ),
-                  child: IconButton(
-                    icon: const Icon(Icons.arrow_back, color: Colors.white),
-                    onPressed: () {
-                      Navigator.maybePop(context);
-                    },
-                  ),
+                  onPressed: () {
+                    Navigator.maybePop(context);
+                  },
                 ),
+                title: Text(
+                  '${state.currentIndex + 1} / ${widget.mediaFiles.length}',
+                  style: const TextStyle(color: Colors.white, fontSize: 17),
+                ),
+                centerTitle: true,
                 actions: [
-                  if (widget.albumId != null && !widget.isGuestMode)
+                  if (widget.albumId != null && !widget.isGuestMode && currentMedia.type == GuardFileType.image)
                     PopupMenuButton<String>(
                       icon: Container(
                         margin: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: Colors.black.withOpacityValue(0.5),
+                          color: Colors.black.withValues(alpha: 0.5),
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(Icons.more_vert, color: Colors.white),
@@ -204,7 +193,7 @@ class _MediaViewerScreenState extends State<MediaViewerScreen> {
                       ),
                       onSelected: (value) async {
                         if (value == 'set_thumbnail') {
-                          await _cubit.setThumbnail();
+                          await _cubit.setThumbnail(context);
                         } else if (value == 'edit_image') {
                           await _cubit.editImage(context);
                         }
@@ -224,21 +213,20 @@ class _MediaViewerScreenState extends State<MediaViewerScreen> {
                             ],
                           ),
                         ),
-                        if (_cubit.isCurrentMediaImage)
-                          PopupMenuItem(
-                            value: 'edit_image',
-                            child: Row(
-                              children: [
-                                const Icon(
-                                  Icons.edit,
-                                  size: 20,
-                                  color: Color(0xFF8B92A5),
-                                ),
-                                const SizedBox(width: 8),
-                                Text(AppStrings.editImage),
-                              ],
-                            ),
+                        PopupMenuItem(
+                          value: 'edit_image',
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.edit,
+                                size: 20,
+                                color: Color(0xFF8B92A5),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(AppStrings.editImage),
+                            ],
                           ),
+                        ),
                       ],
                     ),
                 ],
@@ -248,12 +236,12 @@ class _MediaViewerScreenState extends State<MediaViewerScreen> {
                   PageView.builder(
                     controller: pageController,
                     physics: _isZoomed ? const NeverScrollableScrollPhysics() : const PageScrollPhysics(),
-                    itemCount: widget.images.length,
+                    itemCount: widget.mediaFiles.length,
                     onPageChanged: (index) {
                       _cubit.switchToMedia(index);
                     },
                     itemBuilder: (context, index) {
-                      final file = widget.images[index];
+                      final file = widget.mediaFiles[index];
                       return _buildMediaItem(file, index);
                     },
                   ),
@@ -268,7 +256,7 @@ class _MediaViewerScreenState extends State<MediaViewerScreen> {
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
                           colors: [
-                            Colors.black.withOpacityValue(0.5),
+                            Colors.black.withValues(alpha: 0.5),
                             Colors.transparent,
                           ],
                         ),
@@ -302,16 +290,14 @@ class _MediaViewerScreenState extends State<MediaViewerScreen> {
       child: SizedBox(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
-        child: Center(
-          child: Image.file(
-            File(file.filePath),
-            key: ValueKey('${file.id}_${_imageRefreshKeys[file.id] ?? 0}_${file.createdAt.millisecondsSinceEpoch}'),
-            fit: BoxFit.contain,
-            errorBuilder: (context, error, stackTrace) => const Icon(
-              Icons.broken_image,
-              color: Colors.white,
-              size: 80,
-            ),
+        child: Image.file(
+          File(file.filePath),
+          key: ValueKey('${file.id}_${_cubit.getImageRefreshKey(file.id) ?? 0}_${file.createdAt.millisecondsSinceEpoch}'),
+          fit: BoxFit.contain,
+          errorBuilder: (context, error, stackTrace) => const Icon(
+            Icons.broken_image,
+            color: Colors.white,
+            size: 80,
           ),
         ),
       ),
@@ -319,49 +305,68 @@ class _MediaViewerScreenState extends State<MediaViewerScreen> {
   }
 
   Widget _buildVideoItem(GuardFileModel file, int index) {
-    final videoController = _videoControllers[index];
+    return BlocBuilder<MediaViewerCubit, MediaViewerState>(
+      builder: (context, state) {
+        final videoController = _cubit.getVideoController(index);
 
-    if (videoController == null) {
-      return const Center(
-        child: Icon(
-          Icons.video_file,
-          color: Colors.white,
-          size: 80,
-        ),
-      );
-    }
+        if (videoController == null) {
+          // Video controller is not initialized yet, start initializing
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            _cubit.initializeVideoController(index);
+          });
 
-    return Stack(
-      children: [
-        Center(
-          child: AspectRatio(
-            aspectRatio: videoController.value.aspectRatio,
-            child: VideoPlayer(videoController),
-          ),
-        ),
-        if (!videoController.value.isPlaying)
-          Center(
-            child: GestureDetector(
-              onTap: () {
-                setState(() {
-                  videoController.play();
-                });
-              },
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.5),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.play_arrow,
-                  color: Colors.white,
-                  size: 48,
+          return const Center(
+            child: CircularProgressIndicator(
+              color: Colors.white,
+            ),
+          );
+        }
+
+        // Check if video controller is initialized
+        if (!videoController.value.isInitialized) {
+          return const Center(
+            child: CircularProgressIndicator(
+              color: Colors.white,
+            ),
+          );
+        }
+
+        return Stack(
+          children: [
+            SizedBox(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height,
+              child: Center(
+                child: AspectRatio(
+                  aspectRatio: videoController.value.aspectRatio,
+                  child: VideoPlayer(videoController),
                 ),
               ),
             ),
-          ),
-      ],
+            // Only show play button when video is not playing
+            if (!videoController.value.isPlaying)
+              Center(
+                child: GestureDetector(
+                  onTap: () {
+                    _cubit.toggleVideoPlayback();
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.6),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.play_arrow,
+                      color: Colors.white,
+                      size: 48,
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        );
+      },
     );
   }
 }

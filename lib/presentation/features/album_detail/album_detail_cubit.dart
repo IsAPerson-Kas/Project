@@ -105,11 +105,8 @@ class AlbumDetailCubit extends Cubit<AlbumDetailState> {
           await file.copy(newPath);
 
           // Determine file type based on asset type
-          GuardFileType fileType = GuardFileType.image;
-          if (asset.type == AssetType.video) {
-            fileType = GuardFileType.video;
-          }
-
+          final GuardFileType fileType = asset.type == AssetType.video ? GuardFileType.video : GuardFileType.image;
+          
           // Create GuardFile entry
           await fileRepository.addFile(
             albumId: albumId,

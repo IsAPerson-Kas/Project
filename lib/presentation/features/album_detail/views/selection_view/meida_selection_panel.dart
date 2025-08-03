@@ -168,7 +168,7 @@ class MediaSelectionPanel extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                         builder: (context) => MediaViewerScreen(
-                          images: selectedFiles,
+                          mediaFiles: selectedFiles,
                           initialIndex: 0,
                           albumId: cubit.albumId,
                           isGuestMode: true,

@@ -1,32 +1,42 @@
-part of "media_viewer_cubit.dart";
+part of 'media_viewer_cubit.dart';
+
+enum MediaViewerStatus { initial, loaded, error }
 
 class MediaViewerState extends Equatable {
-  final int currentIndex;
   final MediaViewerStatus status;
+  final int currentIndex;
+  final bool isVideoPlaying;
   final String? errorMessage;
 
   const MediaViewerState({
+    required this.status,
     required this.currentIndex,
-    this.status = MediaViewerStatus.initial,
+    this.isVideoPlaying = false,
     this.errorMessage,
   });
 
   factory MediaViewerState.initial(int initialIndex) {
-    return MediaViewerState(currentIndex: initialIndex);
+    return MediaViewerState(
+      status: MediaViewerStatus.initial,
+      currentIndex: initialIndex,
+      isVideoPlaying: false,
+    );
   }
 
   MediaViewerState copyWith({
-    int? currentIndex,
     MediaViewerStatus? status,
+    int? currentIndex,
+    bool? isVideoPlaying,
     String? errorMessage,
   }) {
     return MediaViewerState(
-      currentIndex: currentIndex ?? this.currentIndex,
       status: status ?? this.status,
+      currentIndex: currentIndex ?? this.currentIndex,
+      isVideoPlaying: isVideoPlaying ?? this.isVideoPlaying,
       errorMessage: errorMessage ?? this.errorMessage,
     );
   }
 
   @override
-  List<Object?> get props => [currentIndex, status, errorMessage];
+  List<Object?> get props => [status, currentIndex, isVideoPlaying, errorMessage];
 }

@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:media_guard_v2/data/datasources/local_database/tables/guard_file.dart';
 import 'package:media_guard_v2/domain/models/guard_file_model.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:video_thumbnail/video_thumbnail.dart';
 
 class FileListGrid extends StatelessWidget {
   final List<GuardFileModel> files;
@@ -55,7 +57,6 @@ class FileListGrid extends StatelessWidget {
             children: [
               _buildFileImage(file),
               _buildFileSelectionIndicator(file, size),
-              _buildFileTypeIndicator(file),
             ],
           ),
         );
@@ -71,20 +72,71 @@ class FileListGrid extends StatelessWidget {
         color: Color(0xFF2A2A2A),
       ),
       alignment: Alignment.center,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(2.0),
-        child: Image.file(
-          File(file.filePath),
-          width: double.infinity,
-          height: double.infinity,
-          cacheWidth: 400,
-          fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) {
-            return const Center(
-              child: Icon(Icons.image_not_supported, size: 30),
-            );
-          },
-        ),
+      child: Stack(
+        children: [
+          if (file.type == GuardFileType.video)
+            FutureBuilder<String?>(
+              future: () async {
+                final tempDir = await getTemporaryDirectory();
+                return VideoThumbnail.thumbnailFile(
+                  video: file.filePath,
+                  thumbnailPath: tempDir.path,
+                  imageFormat: ImageFormat.JPEG,
+                  maxHeight: 400,
+                  quality: 75,
+                );
+              }(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData && snapshot.data != null) {
+                  return Image.file(
+                    File(snapshot.data!),
+                    width: double.infinity,
+                    height: double.infinity,
+                    cacheWidth: 400,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return const Center(
+                        child: Icon(Icons.video_file, size: 30, color: Colors.white),
+                      );
+                    },
+                  );
+                } else {
+                  return const Center(
+                    child: Icon(Icons.video_file, size: 30, color: Colors.white),
+                  );
+                }
+              },
+            )
+          else
+            Image.file(
+              File(file.filePath),
+              width: double.infinity,
+              height: double.infinity,
+              cacheWidth: 400,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return const Center(
+                  child: Icon(Icons.image_not_supported, size: 30),
+                );
+              },
+            ),
+          // Show play button overlay for video files
+          if (file.type == GuardFileType.video)
+            Center(
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.6),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.play_arrow,
+                  color: Colors.white,
+                  size: 20,
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
@@ -102,28 +154,6 @@ class FileListGrid extends StatelessWidget {
           ),
           child: const Icon(
             Icons.check,
-            color: Colors.white,
-            size: 16,
-          ),
-        ),
-      );
-    }
-    return const SizedBox.shrink();
-  }
-
-  Widget _buildFileTypeIndicator(GuardFileModel file) {
-    if (file.type == GuardFileType.video) {
-      return Positioned(
-        bottom: 4,
-        right: 4,
-        child: Container(
-          padding: const EdgeInsets.all(2),
-          decoration: BoxDecoration(
-            color: Colors.black.withValues(alpha: 0.7),
-            borderRadius: BorderRadius.circular(4),
-          ),
-          child: const Icon(
-            Icons.play_arrow,
             color: Colors.white,
             size: 16,
           ),

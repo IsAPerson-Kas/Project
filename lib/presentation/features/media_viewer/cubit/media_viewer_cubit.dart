@@ -1,9 +1,9 @@
-import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:media_guard_v2/core/constaints/app_strings.dart';
 import 'package:media_guard_v2/core/events/app_event_stream.dart';
@@ -13,6 +13,7 @@ import 'package:media_guard_v2/domain/repositories/album_repository.dart';
 import 'package:media_guard_v2/main.dart';
 import 'package:pro_image_editor/core/models/editor_callbacks/pro_image_editor_callbacks.dart';
 import 'package:pro_image_editor/features/main_editor/main_editor.dart';
+import 'package:video_player/video_player.dart';
 
 part 'media_viewer_state.dart';
 
@@ -23,155 +24,208 @@ class MediaViewerCubit extends Cubit<MediaViewerState> {
   final bool isGuestMode;
   final Function(GuardFileModel)? onMediaEdited;
 
+  // Video controllers
+  final Map<int, VideoPlayerController> _videoControllers = {};
+  final Map<int, int> _imageRefreshKeys = {};
+
   MediaViewerCubit({
     required this.mediaFiles,
     required this.initialIndex,
     this.albumId,
     this.isGuestMode = false,
     this.onMediaEdited,
-  }) : super(MediaViewerState.initial(initialIndex));
+  }) : super(MediaViewerState.initial(initialIndex)) {
+    // Don't initialize video controllers in constructor
+    // They will be initialized on demand
+  }
 
-  GuardFileModel get currentMedia => mediaFiles[state.currentIndex];
+  Future<void> initializeVideoController(int index) async {
+    if (_videoControllers.containsKey(index)) {
+      return; // Already initialized
+    }
 
-  /// Switch to a different media file
+    final file = mediaFiles[index];
+    if (file.type != GuardFileType.video) {
+      return; // Not a video file
+    }
+
+    try {
+      final controller = VideoPlayerController.file(File(file.filePath));
+      await controller.initialize();
+
+      // Add listener to update state when video play/pause
+      controller.addListener(() {
+        if (index == state.currentIndex) {
+          emit(state.copyWith(isVideoPlaying: controller.value.isPlaying));
+        }
+      });
+
+      _videoControllers[index] = controller;
+
+      // Emit state to notify UI that video controller is ready
+      if (index == state.currentIndex) {
+        emit(state.copyWith(status: MediaViewerStatus.loaded));
+      }
+    } catch (e) {
+      debugPrint('Failed to initialize video controller for index $index: $e');
+    }
+  }
+
   void switchToMedia(int index) {
-    if (index >= 0 && index < mediaFiles.length && index != state.currentIndex) {
+    if (index >= 0 && index < mediaFiles.length) {
+      // Pause current video if playing
+      final currentVideoController = _videoControllers[state.currentIndex];
+      if (currentVideoController != null && currentVideoController.value.isPlaying) {
+        currentVideoController.pause();
+      }
+
       emit(state.copyWith(currentIndex: index));
     }
   }
 
-  /// Set thumbnail for current album
-  Future<void> setThumbnail() async {
-    if (albumId == null) return;
-
-    try {
-      emit(state.copyWith(status: MediaViewerStatus.loading));
-
-      final albumRepository = getIt<AlbumRepository>();
-      final album = await albumRepository.getAlbumById(albumId!);
-
-      if (album == null) {
-        throw Exception(AppStrings.albumNotFound);
-      }
-
-      final updatedAlbum = album.copyWith(
-        fileThumbailPath: currentMedia.filePath,
-      );
-
-      final success = await albumRepository.updateAlbum(updatedAlbum);
-
-      if (success) {
-        // Emit event for album update
-        AppEventStream().albumUpdated(updatedAlbum);
-        emit(state.copyWith(status: MediaViewerStatus.success));
+  void toggleVideoPlayback() {
+    final videoController = _videoControllers[state.currentIndex];
+    if (videoController != null) {
+      if (videoController.value.isPlaying) {
+        videoController.pause();
       } else {
-        throw Exception(AppStrings.failedToUpdateAlbum);
+        videoController.play();
       }
-    } catch (e) {
-      emit(
-        state.copyWith(
-          status: MediaViewerStatus.error,
-          errorMessage: AppStrings.failedToSetThumbnail,
-        ),
-      );
+      // State will be updated by the listener in _initializeVideoControllers
     }
   }
 
-  /// Edit image (only for image files)
+  VideoPlayerController? getVideoController(int index) {
+    return _videoControllers[index];
+  }
+
+  bool isVideoFile(int index) {
+    if (index >= 0 && index < mediaFiles.length) {
+      return mediaFiles[index].type == GuardFileType.video;
+    }
+    return false;
+  }
+
+  Future<void> setThumbnail(BuildContext context) async {
+    if (state.currentIndex >= 0 && state.currentIndex < mediaFiles.length) {
+      final currentFile = mediaFiles[state.currentIndex];
+
+      try {
+        final albumRepository = getIt<AlbumRepository>();
+        final album = await albumRepository.getAlbumById(albumId!);
+
+        if (album == null) {
+          throw Exception(AppStrings.albumNotFound);
+        }
+
+        final updatedAlbum = album.copyWith(
+          fileThumbailPath: currentFile.filePath,
+        );
+
+        final success = await albumRepository.updateAlbum(updatedAlbum);
+
+        if (success) {
+          // Emit event for album update
+          AppEventStream().albumUpdated(updatedAlbum);
+
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(AppStrings.thumbnailSet)),
+            );
+          }
+        } else {
+          throw Exception(AppStrings.failedToUpdateAlbum);
+        }
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(AppStrings.failedToSetThumbnail)),
+          );
+        }
+      }
+    }
+  }
+
   Future<void> editImage(BuildContext context) async {
-    if (currentMedia.type != GuardFileType.image) return;
+    if (state.currentIndex >= 0 && state.currentIndex < mediaFiles.length) {
+      final currentFile = mediaFiles[state.currentIndex];
 
-    try {
-      emit(state.copyWith(status: MediaViewerStatus.loading));
+      // Only allow editing for image files
+      if (currentFile.type != GuardFileType.image) {
+        return;
+      }
 
-      await Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => ProImageEditor.file(
-            currentMedia.filePath,
-            callbacks: ProImageEditorCallbacks(
-              onImageEditingComplete: (Uint8List bytes) async {
-                try {
-                  final file = File(currentMedia.filePath);
-                  await file.writeAsBytes(bytes);
+      try {
+        await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => ProImageEditor.file(
+              currentFile.filePath,
+              callbacks: ProImageEditorCallbacks(
+                onImageEditingComplete: (Uint8List bytes) async {
+                  try {
+                    final file = File(currentFile.filePath);
+                    await file.writeAsBytes(bytes);
 
-                  // Clear image cache to force reload
-                  PaintingBinding.instance.imageCache.clear();
-                  PaintingBinding.instance.imageCache.clearLiveImages();
+                    // Clear image cache to force reload
+                    PaintingBinding.instance.imageCache.clear();
+                    PaintingBinding.instance.imageCache.clearLiveImages();
 
-                  // Create updated file model and notify parent screen
-                  final updatedFile = GuardFileModel(
-                    id: currentMedia.id,
-                    albumId: currentMedia.albumId,
-                    filePath: currentMedia.filePath,
-                    type: currentMedia.type,
-                    createdAt: DateTime.now(), // Use current time to indicate modification
-                  );
-                  onMediaEdited?.call(updatedFile);
+                    if (context.mounted) {
+                      // Update refresh key for this image
+                      _imageRefreshKeys[currentFile.id] = DateTime.now().millisecondsSinceEpoch;
 
-                  if (context.mounted) {
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(AppStrings.imageEdited)),
-                    );
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(AppStrings.imageEdited)),
+                      );
+
+                      // Create updated file model and notify parent screen
+                      final updatedFile = GuardFileModel(
+                        id: currentFile.id,
+                        albumId: currentFile.albumId,
+                        filePath: currentFile.filePath,
+                        type: currentFile.type,
+                        createdAt: DateTime.now(), // Use current time to indicate modification
+                      );
+                      onMediaEdited?.call(updatedFile);
+                    }
+                  } catch (e) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(AppStrings.errorSavingEditedImage),
+                        ),
+                      );
+                    }
                   }
-                } catch (e) {
-                  if (context.mounted) {
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(AppStrings.errorSavingEditedImage),
-                      ),
-                    );
-                  }
-                }
-              },
+                },
+              ),
             ),
           ),
-        ),
-      );
-
-      emit(state.copyWith(status: MediaViewerStatus.success));
-    } catch (e) {
-      emit(
-        state.copyWith(
-          status: MediaViewerStatus.error,
-          errorMessage: AppStrings.errorOpeningImageEditor,
-        ),
-      );
-    }
-  }
-
-  /// Check if current media is video
-  bool get isCurrentMediaVideo => currentMedia.type == GuardFileType.video;
-
-  /// Check if current media is image
-  bool get isCurrentMediaImage => currentMedia.type == GuardFileType.image;
-
-  /// Get available actions for current media
-  List<MediaViewerAction> get availableActions {
-    final actions = <MediaViewerAction>[];
-
-    if (albumId != null && !isGuestMode) {
-      actions.add(MediaViewerAction.setThumbnail);
-
-      if (isCurrentMediaImage) {
-        actions.add(MediaViewerAction.edit);
+        );
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(AppStrings.errorOpeningImageEditor),
+            ),
+          );
+        }
       }
     }
-
-    return actions;
   }
-}
 
-enum MediaViewerAction {
-  setThumbnail,
-  edit,
-}
+  int? getImageRefreshKey(int fileId) {
+    return _imageRefreshKeys[fileId];
+  }
 
-enum MediaViewerStatus {
-  initial,
-  loading,
-  success,
-  error,
+  @override
+  Future<void> close() {
+    // Dispose video controllers
+    for (final controller in _videoControllers.values) {
+      controller.dispose();
+    }
+    return super.close();
+  }
 }

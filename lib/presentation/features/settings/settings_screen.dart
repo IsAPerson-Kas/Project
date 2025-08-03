@@ -39,6 +39,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
             contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 2),
             minLeadingWidth: 32,
           ),
+          ListTile(
+            leading: Icon(Icons.help_outline, color: iconColor),
+            title: Text(AppStrings.help, style: textStyle),
+            onTap: () => Navigator.pushNamed(context, RoutesNamed.help),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 2),
+            minLeadingWidth: 32,
+          ),
           _buildLanguageTile(iconColor, textStyle),
           // _buildThemeTile(context, iconColor, textStyle),
         ],

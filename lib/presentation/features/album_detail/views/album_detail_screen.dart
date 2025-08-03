@@ -225,7 +225,7 @@ class _AlbumDetailScreenState extends State<AlbumDetailScreen> {
           context,
           MaterialPageRoute(
             builder: (context) => MediaViewerScreen(
-              images: state.files,
+              mediaFiles: state.files,
               initialIndex: state.files.indexWhere((f) => f.id == file.id),
               albumId: widget.albumId,
               onMediaEdited: (editedFile) {
