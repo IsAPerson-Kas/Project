@@ -47,6 +47,7 @@ class _AlbumListScreenState extends State<AlbumListScreen> {
           create: (context) => _cubit,
           child: _buildBody(context),
         ),
+        floatingActionButton: _buildFloatingActionButton(),
       ),
     );
   }
@@ -67,25 +68,25 @@ class _AlbumListScreenState extends State<AlbumListScreen> {
         },
       ),
       actions: [
-        SizedBox(
-          width: 48.0,
-          height: 48.0,
-          child: GestureDetector(
-            onTap: _showAddAlbumDialog,
-            child: Align(
-              alignment: Alignment.center,
-              child: SvgPicture.asset(
-                AssetsPath.icAddAlbum,
-                width: 24.0,
-                height: 24.0,
-                colorFilter: ColorFilter.mode(
-                  Colors.black,
-                  BlendMode.srcIn,
-                ),
-              ),
-            ),
-          ),
-        ),
+        // SizedBox(
+        //   width: 48.0,
+        //   height: 48.0,
+        //   child: GestureDetector(
+        //     onTap: _showAddAlbumDialog,
+        //     child: Align(
+        //       alignment: Alignment.center,
+        //       child: SvgPicture.asset(
+        //         AssetsPath.icAddAlbum,
+        //         width: 24.0,
+        //         height: 24.0,
+        //         colorFilter: ColorFilter.mode(
+        //           Colors.black,
+        //           BlendMode.srcIn,
+        //         ),
+        //       ),
+        //     ),
+        //   ),
+        // ),
       ],
     );
   }
@@ -164,6 +165,17 @@ class _AlbumListScreenState extends State<AlbumListScreen> {
           // Handle cancel if needed
         },
       ),
+    );
+  }
+
+  Widget? _buildFloatingActionButton() {
+    return FloatingActionButton(
+      key: const ValueKey('add_files_button'),
+      backgroundColor: const Color(0xFF9447FF),
+      shape: const CircleBorder(),
+      foregroundColor: Colors.white,
+      onPressed: () => _showAddAlbumDialog(),
+      child: const Icon(Icons.add),
     );
   }
 }

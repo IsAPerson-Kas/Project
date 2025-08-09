@@ -4,6 +4,7 @@ import 'package:media_guard_v2/core/constaints/app_strings.dart';
 import 'package:media_guard_v2/presentation/features/album_detail/views/album_detail_screen.dart';
 import 'package:media_guard_v2/presentation/features/album_list/views/album_list_screen.dart';
 import 'package:media_guard_v2/presentation/features/album_unlock/views/album_unlock_screen.dart';
+import 'package:media_guard_v2/presentation/features/app_lock/app_lock_screen.dart';
 import 'package:media_guard_v2/presentation/features/import_media/cubit/import_media_cubit.dart';
 import 'package:media_guard_v2/presentation/features/import_media/import_media_screen.dart';
 import 'package:media_guard_v2/presentation/features/initial/initial_screen.dart';
@@ -68,6 +69,8 @@ class RoutesGenerate {
           ),
           settings: settings,
         );
+      case RoutesNamed.appLock:
+        return _buildRoute(const AppLockScreen(), settings: settings);
       default:
         return _buildRoute(const _ErrorScreen(), settings: settings);
     }

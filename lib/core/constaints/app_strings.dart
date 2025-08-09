@@ -122,6 +122,10 @@ class AppStrings {
       'failedToLoadMoreAssets': 'Failed to load more assets',
       'failedToLoadAlbumAssets': 'Failed to load album assets',
       'idMustBePresent': 'ID must be present when updating',
+      'appLocked': 'App Locked',
+      'appLockedDueToIncorrectPassword': 'App is locked due to incorrect password',
+      'timeRemaining': 'Time remaining:',
+      'pleaseWaitForLockTime': 'Please wait for the lock time to expire to continue using the app',
     },
     Language.vietnamese: {
       'appName': 'Photo Guard',
@@ -237,6 +241,10 @@ class AppStrings {
       'failedToLoadMoreAssets': 'Không thể tải thêm tài nguyên',
       'failedToLoadAlbumAssets': 'Không thể tải tài nguyên album',
       'idMustBePresent': 'ID phải có khi cập nhật',
+      'appLocked': 'App Bị Khóa',
+      'appLockedDueToIncorrectPassword': 'App đang bị khóa do nhập mật khẩu sai',
+      'timeRemaining': 'Thời gian còn lại:',
+      'pleaseWaitForLockTime': 'Vui lòng đợi hết thời gian khóa để tiếp tục sử dụng app',
     },
   };
 
@@ -364,4 +372,8 @@ class AppStrings {
   static String get failedToLoadMoreAssets => get('failedToLoadMoreAssets');
   static String get failedToLoadAlbumAssets => get('failedToLoadAlbumAssets');
   static String get idMustBePresent => get('idMustBePresent');
+  static String get appLocked => get('appLocked');
+  static String get appLockedDueToIncorrectPassword => get('appLockedDueToIncorrectPassword');
+  static String get timeRemaining => get('timeRemaining');
+  static String get pleaseWaitForLockTime => get('pleaseWaitForLockTime');
 }
