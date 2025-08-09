@@ -10,4 +10,5 @@ class RoutesNamed {
   static const String onboarding = '/onboarding';
   static const String albumUnlock = '/album/unlock';
   static const String help = '/help';
+  static const String appLock = '/app/lock';
 }

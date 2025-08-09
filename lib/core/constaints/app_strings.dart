@@ -140,6 +140,10 @@ class AppStrings {
       'helpNotesContent': '• Access permissions: Need to grant photo library, camera and storage permissions\n• Data security: All passwords are encrypted\n• Efficient use: Create separate albums, set strong passwords, check failed attempts regularly',
       'helpSupport': 'Support',
       'helpSupportContent': 'If you encounter problems when using:\n1. Check access permissions in Settings\n2. Ensure device has sufficient storage space\n3. Restart the app if necessary',
+      'appLocked': 'App Locked',
+      'appLockedDueToIncorrectPassword': 'App is locked due to incorrect password',
+      'timeRemaining': 'Time remaining:',
+      'pleaseWaitForLockTime': 'Please wait for the lock time to expire to continue using the app',
     },
     Language.vietnamese: {
       'appName': 'Photo Guard',
@@ -273,6 +277,10 @@ class AppStrings {
       'helpNotesContent': '• Quyền truy cập: Cần cấp quyền thư viện ảnh, camera và lưu trữ\n• Bảo mật dữ liệu: Tất cả mật khẩu được mã hóa\n• Sử dụng hiệu quả: Tạo album riêng biệt, đặt mật khẩu mạnh, kiểm tra lần thử thất bại thường xuyên',
       'helpSupport': 'Hỗ trợ',
       'helpSupportContent': 'Nếu gặp vấn đề khi sử dụng:\n1. Kiểm tra quyền truy cập trong Settings\n2. Đảm bảo thiết bị có đủ dung lượng lưu trữ\n3. Khởi động lại ứng dụng nếu cần thiết',
+      'appLocked': 'App Bị Khóa',
+      'appLockedDueToIncorrectPassword': 'App đang bị khóa do nhập mật khẩu sai',
+      'timeRemaining': 'Thời gian còn lại:',
+      'pleaseWaitForLockTime': 'Vui lòng đợi hết thời gian khóa để tiếp tục sử dụng app',
     },
   };
 
@@ -418,4 +426,8 @@ class AppStrings {
   static String get helpNotesContent => get('helpNotesContent');
   static String get helpSupport => get('helpSupport');
   static String get helpSupportContent => get('helpSupportContent');
+  static String get appLocked => get('appLocked');
+  static String get appLockedDueToIncorrectPassword => get('appLockedDueToIncorrectPassword');
+  static String get timeRemaining => get('timeRemaining');
+  static String get pleaseWaitForLockTime => get('pleaseWaitForLockTime');
 }

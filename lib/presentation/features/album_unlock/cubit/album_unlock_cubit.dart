@@ -1,10 +1,14 @@
 import 'package:camera/camera.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:media_guard_v2/core/constaints/global_keys.dart';
 import 'package:media_guard_v2/core/utils/password_hasher.dart';
+import 'package:media_guard_v2/data/datasources/app_preferences.dart';
 import 'package:media_guard_v2/data/datasources/local_database/tables/guard_file.dart';
 import 'package:media_guard_v2/domain/repositories/album_repository.dart';
 import 'package:media_guard_v2/domain/repositories/file_repository.dart';
+import 'package:media_guard_v2/router/routes_named.dart';
 
 part 'album_unlock_state.dart';
 
@@ -94,16 +98,47 @@ class AlbumUnlockCubit extends Cubit<AlbumUnlockState> {
     }
   }
 
-  Future<bool> validateAlbumPassword(String password, int albumId) async {
+  Future<bool> validateAlbumPassword(String password, int albumId, {bool isUnlockMode = false}) async {
     try {
       final album = await _albumRepository.getAlbumById(albumId);
 
       final hashedPassword = PasswordHasher.hash(password);
-      return album != null && album.password == hashedPassword;
+      final isValid = album != null && album.password == hashedPassword;
+
+      if (isUnlockMode) {
+        if (isValid) {
+          // Reset failed attempts on successful password
+          await AppPreferences.resetFailedAttempts();
+        } else {
+          // Increment failed attempts on wrong password
+          await AppPreferences.incrementFailedAttempts();
+          final failedAttempts = await AppPreferences.getFailedAttempts();
+
+          // Lock app if failed attempts >= 5
+          if (failedAttempts >= 5) {
+            await AppPreferences.lockApp(failedAttempts);
+            _navigateToAppLock();
+          }
+        }
+      }
+
+      return isValid;
     } catch (e) {
       emit(state.copyWith(errorMessage: e.toString()));
       return false;
     }
+  }
+
+  void _navigateToAppLock() {
+    final context = GlobalKeys.navigatorKey.currentContext;
+    if (context == null) return;
+
+    // Clear all routes and navigate to app lock screen
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      RoutesNamed.appLock,
+      (route) => false, // Remove all previous routes
+    );
   }
 
   Future<void> saveFailedAttemptImage(String imagePath) async {

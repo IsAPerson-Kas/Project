@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:media_guard_v2/core/constaints/app_strings.dart';
+import 'package:media_guard_v2/data/datasources/app_preferences.dart';
 import 'package:media_guard_v2/domain/repositories/album_repository.dart';
 import 'package:media_guard_v2/domain/repositories/file_repository.dart';
 import 'package:media_guard_v2/main.dart';
@@ -245,7 +246,7 @@ class _AlbumUnlockScreenState extends State<AlbumUnlockScreen> {
         bool isValid = false;
 
         if (widget.albumId != null) {
-          isValid = await _cubit.validateAlbumPassword(_enteredPassword, widget.albumId!);
+          isValid = await _cubit.validateAlbumPassword(_enteredPassword, widget.albumId!, isUnlockMode: true);
         } else if (widget.onComplete != null) {
           // For operations like delete and remove, we don't need to validate against album ID
           // The calling method will handle the validation
@@ -274,8 +275,11 @@ class _AlbumUnlockScreenState extends State<AlbumUnlockScreen> {
             setState(() {
               _enteredPassword = '';
             });
+
+            // Get current failed attempts to show in snack bar
+            final failedAttempts = await AppPreferences.getFailedAttempts();
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(AppStrings.incorrectPassword)),
+              SnackBar(content: Text('${AppStrings.incorrectPassword} ($failedAttempts/5)')),
             );
           }
         }
