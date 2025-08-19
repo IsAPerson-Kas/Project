@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:media_guard_v2/core/constaints/app_strings.dart';
-import 'package:media_guard_v2/core/constaints/assets_path.dart';
 import 'package:media_guard_v2/domain/models/guard_album_model.dart';
 import 'package:media_guard_v2/domain/repositories/album_repository.dart';
 import 'package:media_guard_v2/domain/repositories/file_repository.dart';

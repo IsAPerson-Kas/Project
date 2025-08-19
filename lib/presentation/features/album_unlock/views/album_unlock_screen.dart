@@ -278,9 +278,11 @@ class _AlbumUnlockScreenState extends State<AlbumUnlockScreen> {
 
             // Get current failed attempts to show in snack bar
             final failedAttempts = await AppPreferences.getFailedAttempts();
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('${AppStrings.incorrectPassword} ($failedAttempts/5)')),
-            );
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('${AppStrings.incorrectPassword} ($failedAttempts/5)')),
+              );
+            }
           }
         }
       } else {

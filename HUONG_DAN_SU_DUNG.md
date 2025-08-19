@@ -97,12 +97,26 @@ Khi ở chế độ chọn, panel sẽ hiển thị các tùy chọn:
 
 ### 5. Tính năng bảo mật nâng cao
 
-#### 5.1 Xác thực sinh trắc học
+#### 5.1 Khóa ứng dụng tự động (App Lock)
+- **Kích hoạt**: Tự động kích hoạt khi nhập sai mật khẩu nhiều lần
+- **Ngưỡng kích hoạt**: App sẽ bị khóa sau 5 lần nhập sai mật khẩu liên tiếp
+- **Thời gian khóa tăng dần**:
+  - **5 lần sai**: Khóa 5 phút
+  - **6 lần sai**: Khóa 15 phút  
+  - **7 lần sai**: Khóa 20 phút
+  - **8 lần sai**: Khóa 30 phút
+  - **9 lần sai**: Khóa 60 phút (1 giờ)
+  - **10 lần sai trở lên**: Khóa 24 giờ (1 ngày)
+- **Màn hình khóa**: Hiển thị thời gian còn lại và không thể thoát
+- **Reset bộ đếm**: Bộ đếm lần thử thất bại sẽ được reset khi nhập đúng mật khẩu
+- **Bảo vệ**: Ngăn chặn tấn công brute-force và truy cập trái phép
+
+#### 5.2 Xác thực sinh trắc học
 - **Vân tay/Face ID**: Có thể sử dụng vân tay hoặc Face ID thay vì mật khẩu
 - **Kích hoạt**: Nhấn vào biểu tượng vân tay khi nhập mật khẩu
 - **Bảo mật**: Vẫn chụp ảnh khi xác thực thất bại
 
-#### 5.2 Mật khẩu 6 số
+#### 5.3 Mật khẩu 6 số
 - **Định dạng**: Mật khẩu phải có đúng 6 chữ số
 - **Bảo mật**: Mật khẩu được mã hóa trước khi lưu trữ
 - **Xác nhận**: Phải nhập lại mật khẩu khi tạo mới
@@ -124,9 +138,160 @@ Khi ở chế độ chọn, panel sẽ hiển thị các tùy chọn:
 - **Đặt mật khẩu mạnh**: Sử dụng mật khẩu khó đoán
 - **Kiểm tra lần thử thất bại**: Thường xuyên kiểm tra để phát hiện xâm nhập
 - **Sao lưu dữ liệu**: Tải xuống ảnh quan trọng để sao lưu
+- **Lưu ý về App Lock**: Tránh nhập sai mật khẩu nhiều lần để không bị khóa app
 
 ## Hỗ trợ
 Nếu gặp vấn đề khi sử dụng, vui lòng:
 1. Kiểm tra quyền truy cập trong Settings
 2. Đảm bảo thiết bị có đủ dung lượng lưu trữ
-3. Khởi động lại ứng dụng nếu cần thiết 
+3. Khởi động lại ứng dụng nếu cần thiết
+
+---
+
+# PHOTO GUARD APP USER GUIDE
+
+## Overview
+Photo Guard is a personal photo and video protection app with advanced security features. The app allows you to create private albums protected by passwords and surveillance cameras.
+
+## Main Features
+
+### 1. Main Screen (Album List)
+- **View album list**: Display all created albums
+- **Add new album**: Press the "+" icon to create a new album
+- **Access settings**: Press the menu icon (3 horizontal lines) to go to Settings
+
+### 2. Settings Functions
+
+#### 2.1 View Failed Attempts
+- **Purpose**: View photos captured when someone enters wrong password
+- **How to use**: 
+  - Go to Settings → press "View Failed Attempts"
+  - View list of automatically captured photos
+  - **Selection mode**: 
+    - Long press photo to enter selection mode
+    - Press "Select All" to select all
+    - Press "Delete" to delete selected photos
+  - **View photo**: Press photo to view details
+
+#### 2.2 Language Settings
+- **Switch language**: 
+  - Press "Language" to open options
+  - Choose "English" or "Vietnamese"
+  - Language will change immediately
+
+### 3. Camera Function When Wrong Password
+
+#### 3.1 Automatic Operation
+- **Front camera**: Automatically activates front camera when someone enters password
+- **Capture photos**: Automatically capture photos when:
+  - Wrong password is entered
+  - Biometric authentication fails
+  - Error occurs during authentication
+- **Storage**: Photos are saved to "Failed Password Attempts" album
+
+#### 3.2 Security Alert
+- **Notification**: Display warning "Front camera is active" when camera is operating
+- **Purpose**: Help you know when someone is trying to access your album
+
+### 4. Album Detail Screen Functions
+
+#### 4.1 Album Management (3-dot Menu)
+- **Rename Album**:
+  - Press menu → "Rename Album"
+  - Enter new album name
+  - Press "Rename" to save
+
+- **Add Password**:
+  - Press menu → "Add Password"
+  - Enter 6-digit password
+  - Confirm password again
+  - Album will be protected
+
+- **Remove Password**:
+  - Press menu → "Remove Password"
+  - Enter current password to confirm
+  - Password will be removed
+
+- **Delete Album**:
+  - Press menu → "Delete Album"
+  - If album has password: enter password to confirm
+  - If no password: confirm directly
+  - **Warning**: All photos in album will be permanently deleted
+
+#### 4.2 Photo Management in Album
+- **Add photos**: Press "+" (Floating Action Button) to add photos from library
+- **View photos**: Press photo to view details in Media Viewer
+- **Selection mode**: 
+  - Long press photo to enter selection mode
+  - Press "Select All" to select all photos
+
+#### 4.3 Selection Panel
+When in selection mode, panel will display options:
+
+- **Share**:
+  - Share selected photos with other apps
+  - Export photos outside album
+
+- **Download**:
+  - Download selected photos to device
+  - Save to device photo library
+
+- **Guest Mode**:
+  - Only displayed when album has password
+  - Allow viewing photos without entering password
+  - Useful for temporarily showing photos to others
+
+- **Delete**:
+  - Delete selected photos from album
+  - Requires confirmation before deletion
+
+### 5. Advanced Security Features
+
+#### 5.1 Automatic App Lock
+- **Activation**: Automatically activates when wrong password is entered multiple times
+- **Activation threshold**: App will be locked after 5 consecutive wrong password attempts
+- **Escalating lock duration**:
+  - **5 wrong attempts**: Lock for 5 minutes
+  - **6 wrong attempts**: Lock for 15 minutes  
+  - **7 wrong attempts**: Lock for 20 minutes
+  - **8 wrong attempts**: Lock for 30 minutes
+  - **9 wrong attempts**: Lock for 60 minutes (1 hour)
+  - **10+ wrong attempts**: Lock for 24 hours (1 day)
+- **Lock screen**: Shows remaining time and cannot be exited
+- **Counter reset**: Failed attempt counter resets when correct password is entered
+- **Protection**: Prevents brute-force attacks and unauthorized access
+
+#### 5.2 Biometric Authentication
+- **Fingerprint/Face ID**: Can use fingerprint or Face ID instead of password
+- **Activation**: Press fingerprint icon when entering password
+- **Security**: Still captures photos when authentication fails
+
+#### 5.3 6-Digit Password
+- **Format**: Password must be exactly 6 digits
+- **Security**: Password is encrypted before storage
+- **Confirmation**: Must re-enter password when creating new one
+
+### 6. Important Notes
+
+#### 6.1 Access Permissions
+- **Photo library**: Need to grant permission to import photos
+- **Camera**: Need to grant permission for surveillance photos
+- **Storage**: Need permission to save downloaded photos
+
+#### 6.2 Data Security
+- **Encryption**: All passwords are encrypted before saving
+- **Surveillance camera**: Operates automatically for protection
+- **Data deletion**: Data is permanently deleted, cannot be recovered
+
+#### 6.3 Effective Use
+- **Create separate albums**: Categorize photos by purpose
+- **Set strong passwords**: Use hard-to-guess passwords
+- **Check failed attempts**: Regularly check to detect intrusions
+- **Backup data**: Download important photos for backup
+- **App Lock note**: Avoid entering wrong password multiple times to prevent app lock
+
+## Support
+If you encounter problems when using:
+1. Check access permissions in Settings
+2. Ensure device has sufficient storage space
+3. Restart the app if necessary

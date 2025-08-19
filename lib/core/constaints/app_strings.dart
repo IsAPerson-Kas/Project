@@ -125,19 +125,25 @@ class AppStrings {
       'help': 'Help',
       'helpGuide': 'Help Guide',
       'helpOverview': 'Overview',
-      'helpOverviewContent': 'Photo Guard is a personal photo and video protection app with advanced security features. The app allows you to create private albums protected by passwords and surveillance cameras.',
+      'helpOverviewContent':
+          'Photo Guard is a personal photo and video protection app with advanced security features. The app allows you to create private albums protected by passwords and surveillance cameras.',
       'helpMainScreen': '1. Main Screen (Album List)',
-      'helpMainScreenContent': '• View album list: Display all created albums\n• Add new album: Press the "+" icon to create a new album\n• Access settings: Press the menu icon (3 horizontal lines) to go to Settings',
+      'helpMainScreenContent':
+          '• View album list: Display all created albums\n• Add new album: Press the "+" icon to create a new album\n• Access settings: Press the menu icon (3 horizontal lines) to go to Settings',
       'helpSettings': '2. Settings Functions',
       'helpSettingsContent': '• View failed attempts: View photos captured when someone enters wrong password\n• Language settings: Switch between English and Vietnamese',
       'helpCamera': '3. Camera Function When Wrong Password',
-      'helpCameraContent': '• Front camera automatically activates when someone enters password\n• Automatically capture photos when wrong password is entered or biometric authentication fails\n• Photos are saved to "Failed Password Attempts" album\n• Display warning "Front camera is active" when camera is operating',
+      'helpCameraContent':
+          '• Front camera automatically activates when someone enters password\n• Automatically capture photos when wrong password is entered or biometric authentication fails\n• Photos are saved to "Failed Password Attempts" album\n• Display warning "Front camera is active" when camera is operating',
       'helpAlbumDetail': '4. Album Detail Screen Functions',
-      'helpAlbumDetailContent': '• Album management: Rename, add/remove password, delete album\n• Photo management: Add photos, view photos, selection mode\n• Selection panel: Share, download, guest mode, delete photos',
+      'helpAlbumDetailContent':
+          '• Album management: Rename, add/remove password, delete album\n• Photo management: Add photos, view photos, selection mode\n• Selection panel: Share, download, guest mode, delete photos',
       'helpSecurity': '5. Advanced Security Features',
-      'helpSecurityContent': '• Biometric authentication: Can use fingerprint or Face ID\n• 6-digit password: Encrypted before storage\n• Surveillance camera: Automatically operates for protection',
+      'helpSecurityContent':
+          '• Automatic App Lock: Locks app after 5 failed password attempts with escalating durations (5min → 15min → 20min → 30min → 1hr → 24hr)\n• Biometric authentication: Can use fingerprint or Face ID\n• 6-digit password: Encrypted before storage\n• Surveillance camera: Automatically operates for protection',
       'helpNotes': '6. Important Notes',
-      'helpNotesContent': '• Access permissions: Need to grant photo library, camera and storage permissions\n• Data security: All passwords are encrypted\n• Efficient use: Create separate albums, set strong passwords, check failed attempts regularly',
+      'helpNotesContent':
+          '• Access permissions: Need to grant photo library, camera and storage permissions\n• Data security: All passwords are encrypted\n• Efficient use: Create separate albums, set strong passwords, check failed attempts regularly\n• App Lock warning: Avoid entering wrong password multiple times to prevent app lock',
       'helpSupport': 'Support',
       'helpSupportContent': 'If you encounter problems when using:\n1. Check access permissions in Settings\n2. Ensure device has sufficient storage space\n3. Restart the app if necessary',
       'appLocked': 'App Locked',
@@ -262,19 +268,24 @@ class AppStrings {
       'help': 'Trợ giúp',
       'helpGuide': 'Hướng dẫn sử dụng',
       'helpOverview': 'Tổng quan',
-      'helpOverviewContent': 'Photo Guard là ứng dụng bảo vệ ảnh và video cá nhân với các tính năng bảo mật cao cấp. Ứng dụng cho phép bạn tạo các album riêng tư được bảo vệ bằng mật khẩu và camera giám sát.',
+      'helpOverviewContent':
+          'Photo Guard là ứng dụng bảo vệ ảnh và video cá nhân với các tính năng bảo mật cao cấp. Ứng dụng cho phép bạn tạo các album riêng tư được bảo vệ bằng mật khẩu và camera giám sát.',
       'helpMainScreen': '1. Màn hình chính (Album List)',
-      'helpMainScreenContent': '• Xem danh sách album: Hiển thị tất cả album đã tạo\n• Thêm album mới: Nhấn vào biểu tượng "+" để tạo album mới\n• Truy cập cài đặt: Nhấn vào biểu tượng menu (3 gạch ngang) để vào Settings',
+      'helpMainScreenContent':
+          '• Xem danh sách album: Hiển thị tất cả album đã tạo\n• Thêm album mới: Nhấn vào biểu tượng "+" để tạo album mới\n• Truy cập cài đặt: Nhấn vào biểu tượng menu (3 gạch ngang) để vào Settings',
       'helpSettings': '2. Chức năng trong Settings',
       'helpSettingsContent': '• Xem lần thử thất bại: Xem lại các ảnh được chụp khi có người nhập sai mật khẩu\n• Cài đặt ngôn ngữ: Chuyển đổi giữa tiếng Anh và tiếng Việt',
       'helpCamera': '3. Chức năng chụp ảnh khi nhập sai mật khẩu',
-      'helpCameraContent': '• Camera trước tự động kích hoạt khi có người nhập mật khẩu\n• Tự động chụp ảnh khi nhập sai mật khẩu hoặc xác thực sinh trắc học thất bại\n• Ảnh được lưu vào album "Failed Password Attempts"\n• Hiển thị cảnh báo "Front camera is active" khi camera đang hoạt động',
+      'helpCameraContent':
+          '• Camera trước tự động kích hoạt khi có người nhập mật khẩu\n• Tự động chụp ảnh khi nhập sai mật khẩu hoặc xác thực sinh trắc học thất bại\n• Ảnh được lưu vào album "Failed Password Attempts"\n• Hiển thị cảnh báo "Front camera is active" khi camera đang hoạt động',
       'helpAlbumDetail': '4. Các chức năng trong màn hình Album Detail',
       'helpAlbumDetailContent': '• Quản lý album: Đổi tên, thêm/xóa mật khẩu, xóa album\n• Quản lý ảnh: Thêm ảnh, xem ảnh, chế độ chọn\n• Panel chọn ảnh: Chia sẻ, tải xuống, chế độ khách, xóa ảnh',
       'helpSecurity': '5. Tính năng bảo mật nâng cao',
-      'helpSecurityContent': '• Xác thực sinh trắc học: Có thể sử dụng vân tay hoặc Face ID\n• Mật khẩu 6 số: Được mã hóa trước khi lưu trữ\n• Camera giám sát: Hoạt động tự động để bảo vệ',
+      'helpSecurityContent':
+          '• Khóa App tự động: Khóa app sau 5 lần nhập sai mật khẩu với thời gian tăng dần (5phút → 15phút → 20phút → 30phút → 1giờ → 24giờ)\n• Xác thực sinh trắc học: Có thể sử dụng vân tay hoặc Face ID\n• Mật khẩu 6 số: Được mã hóa trước khi lưu trữ\n• Camera giám sát: Hoạt động tự động để bảo vệ',
       'helpNotes': '6. Lưu ý quan trọng',
-      'helpNotesContent': '• Quyền truy cập: Cần cấp quyền thư viện ảnh, camera và lưu trữ\n• Bảo mật dữ liệu: Tất cả mật khẩu được mã hóa\n• Sử dụng hiệu quả: Tạo album riêng biệt, đặt mật khẩu mạnh, kiểm tra lần thử thất bại thường xuyên',
+      'helpNotesContent':
+          '• Quyền truy cập: Cần cấp quyền thư viện ảnh, camera và lưu trữ\n• Bảo mật dữ liệu: Tất cả mật khẩu được mã hóa\n• Sử dụng hiệu quả: Tạo album riêng biệt, đặt mật khẩu mạnh, kiểm tra lần thử thất bại thường xuyên\n• Cảnh báo App Lock: Tránh nhập sai mật khẩu nhiều lần để không bị khóa app',
       'helpSupport': 'Hỗ trợ',
       'helpSupportContent': 'Nếu gặp vấn đề khi sử dụng:\n1. Kiểm tra quyền truy cập trong Settings\n2. Đảm bảo thiết bị có đủ dung lượng lưu trữ\n3. Khởi động lại ứng dụng nếu cần thiết',
       'appLocked': 'App Bị Khóa',
